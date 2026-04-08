@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)file:///C:/Users/felix/Downloads/banner-prompt-gen-v2.html -->
+<html lang="uk"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BannerPrompt v2</title>
+<link href="./BannerPrompt v2_files/css2" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080809;--s1:#0f0f11;--s2:#17171a;--s3:#222226;--s4:#2c2c32;
+  --b1:rgba(255,255,255,0.055);--b2:rgba(255,255,255,0.1);--b3:rgba(255,255,255,0.18);
+  --t1:#f4f4f5;--t2:#9f9fa8;--t3:#52525c;
+  --acc:#d4ff4e;--acc-d:#a8cc28;--acc-bg:rgba(212,255,78,0.07);--acc-br:rgba(212,255,78,0.25);
+  --grn:#3dffa0;--grn-bg:rgba(61,255,160,0.07);
+  --red:#ff5555;--red-bg:rgba(255,85,85,0.08);
+  --blue:#60a5fa;--blue-bg:rgba(96,165,250,0.07);
+  --r:7px;--r2:11px;--r3:15px;
+  --sidebar:360px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--t1);display:flex;flex-direction:column}
+
+/* ── NAV ── */
+nav{height:52px;min-height:52px;background:var(--s1);border-bottom:1px solid var(--b1);padding:0 1.25rem;display:flex;align-items:center;gap:1rem;z-index:200}
+.brand{font-family:'Cabinet Grotesk',sans-serif;font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:.45rem;letter-spacing:-.02em;white-space:nowrap}
+.dot{width:7px;height:7px;background:var(--acc);border-radius:50%;animation:blink 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ver{font-size:9px;color:var(--t3);border:1px solid var(--b2);border-radius:4px;padding:1px 5px;margin-left:2px}
+.nav-sep{flex:1}
+.tabs{display:flex;gap:2px}
+.tab{background:none;border:none;color:var(--t2);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:.35rem .75rem;border-radius:var(--r);cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.tab:hover{color:var(--t1);background:var(--s3)}
+.tab.on{color:var(--acc);background:var(--acc-bg)}
+
+/* ── LAYOUT ── */
+.workspace{flex:1;display:flex;min-height:0}
+.sidebar{width:var(--sidebar);min-width:var(--sidebar);background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+
+/* ── SIDEBAR SECTIONS ── */
+.sec{border-bottom:1px solid var(--b1)}
+.sec-head{padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.sec-head:hover{background:var(--s2)}
+.sec-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+.sec-arrow{font-size:10px;color:var(--t3);transition:transform .2s}
+.sec.open .sec-arrow{transform:rotate(180deg)}
+.sec-body{display:none;padding:.75rem 1rem;flex-direction:column;gap:.65rem}
+.sec.open .sec-body{display:flex}
+
+/* ── MATCH LIST ── */
+.match-list{flex:1;overflow-y:auto;padding:.5rem}
+.match-item{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:.6rem .85rem;cursor:pointer;transition:all .12s;margin-bottom:.35rem}
+.match-item:hover{border-color:var(--b2);background:var(--s3)}
+.match-item.active{border-color:var(--acc-br);background:var(--acc-bg)}
+.mi-sport{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:.2rem;display:flex;align-items:center;gap:.35rem}
+.mi-name{font-size:12.5px;color:var(--t1);line-height:1.35}
+.mi-meta{font-size:10px;color:var(--t3);margin-top:.25rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.geo-tag{background:var(--s4);border-radius:3px;padding:1px 5px;font-size:9px;color:var(--t2)}
+
+/* ── FORM ELEMENTS ── */
+.field{display:flex;flex-direction:column;gap:.3rem}
+.lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+input,select,textarea{background:var(--s2);border:1px solid var(--b2);color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:.45rem .7rem;border-radius:var(--r);outline:none;width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2352525c' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;padding-right:1.75rem}
+textarea{resize:vertical;line-height:1.6;min-height:60px}
+
+/* ── GEO CHIPS ── */
+.geo-wrap{display:flex;flex-wrap:wrap;gap:.3rem}
+.gchip{background:var(--s3);border:1px solid var(--b1);border-radius:5px;padding:.25rem .5rem;font-size:10px;cursor:pointer;transition:all .12s;user-select:none;display:flex;align-items:center;gap:.2rem}
+.gchip:hover{border-color:var(--b2)}
+.gchip.on{background:var(--acc-bg);border-color:var(--acc-br);color:var(--acc)}
+
+/* ── BUTTONS ── */
+.btn{background:transparent;border:1px solid var(--b2);color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:.4rem .8rem;border-radius:var(--r);cursor:pointer;transition:all .15s;letter-spacing:.03em;white-space:nowrap}
+.btn:hover{border-color:var(--b3)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-acc{background:var(--acc);border-color:var(--acc);color:#08080a;font-weight:500}
+.btn-acc:hover:not(:disabled){background:var(--acc-d);border-color:var(--acc-d)}
+.btn-sm{font-size:10px;padding:.25rem .55rem}
+.btn-icon{width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+
+/* ── MAIN PANEL ── */
+.main-toolbar{padding:.75rem 1.25rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.75rem;flex-shrink:0}
+.main-body{flex:1;overflow-y:auto;padding:1.25rem}
+.main-title{font-size:12px;font-weight:500;color:var(--t2)}
+
+/* ── SHEETS IMPORT ── */
+.sheets-area{background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);padding:1rem;display:flex;flex-direction:column;gap:.65rem}
+.sheets-row{display:flex;gap:.5rem;align-items:flex-end}
+.sheets-status{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:.4rem}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0}
+.status-dot.ok{background:var(--grn)}
+.status-dot.err{background:var(--red)}
+.status-dot.loading{background:var(--acc);animation:blink 1s linear infinite}
+
+/* ── PROMPT SEARCH ── */
+.psearch-wrap{position:relative}
+.psearch-wrap input{padding-left:1.75rem}
+.psearch-icon{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);color:var(--t3);font-size:12px;pointer-events:none}
+.psearch-results{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);overflow:hidden;margin-top:.35rem;display:none}
+.psearch-results.open{display:block}
+.pr-item{padding:.5rem .75rem;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--b1)}
+.pr-item:last-child{border-bottom:none}
+.pr-item:hover{background:var(--s3)}
+.pr-item.on{background:var(--acc-bg)}
+.pr-name{font-size:12px;color:var(--t1)}
+.pr-preview{font-size:10px;color:var(--t3);margin-top:.15rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pr-score{font-size:9px;color:var(--acc);margin-left:.3rem}
+
+/* ── RESULTS ── */
+.result-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r3);overflow:hidden;margin-bottom:.85rem}
+.rc-head{padding:.6rem 1rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:.5rem}
+.rc-flag{font-size:1rem}
+.rc-geo{font-size:12px;font-weight:500}
+.rc-words{font-size:10px;color:var(--t3);margin-left:auto}
+.rc-body{padding:.85rem 1rem}
+.rc-text{font-size:12px;line-height:1.8;color:var(--t1);white-space:pre-wrap;word-break:break-word}
+.copy-btn{background:transparent;border:1px solid var(--b2);color:var(--t2);font-family:'IBM Plex Mono',monospace;font-size:9px;padding:.2rem .55rem;border-radius:5px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.copy-btn:hover{border-color:var(--acc);color:var(--acc)}
+.copy-btn.done{border-color:var(--grn);color:var(--grn)}
+
+/* ── LOADING ── */
+.spin{display:inline-block;width:12px;height:12px;border:1.5px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:rot .55s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;gap:.5rem;font-size:11px;color:var(--t2);padding:.5rem 0}
+.err-box{background:var(--red-bg);border:1px solid rgba(255,85,85,.2);border-radius:var(--r);padding:.6rem .85rem;font-size:11px;color:var(--red);line-height:1.5}
+
+/* ── PROMPT LIBRARY ── */
+.lib-grid{display:flex;flex-direction:column;gap:.35rem}
+.lib-card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:.6rem .85rem;cursor:pointer;transition:all .12s;position:relative}
+.lib-card:hover{border-color:var(--b2)}
+.lib-card.on{border-color:var(--acc-br);background:var(--acc-bg)}
+.lc-name{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:.2rem;padding-right:3.5rem}
+.lc-preview{font-size:10.5px;color:var(--t3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lc-tags{margin-top:.35rem;display:flex;flex-wrap:wrap;gap:.2rem}
+.lc-tag{background:var(--s3);border-radius:3px;padding:1px 5px;font-size:9px;color:var(--t3)}
+.lc-actions{position:absolute;top:.5rem;right:.5rem;display:none;gap:.2rem}
+.lib-card:hover .lc-actions{display:flex}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--r3);width:100%;max-width:560px;display:flex;flex-direction:column;overflow:hidden;max-height:90vh}
+.mh{padding:.85rem 1.1rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:13px;font-weight:500}
+.mb{padding:1rem 1.1rem;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.75rem}
+.mf{padding:.85rem 1.1rem;border-bottom:none;border-top:1px solid var(--b1);display:flex;gap:.5rem;justify-content:flex-end}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:.65rem;color:var(--t3)}
+.empty-ico{font-size:2.2rem;opacity:.25}
+.empty-txt{font-size:12px}
+
+/* ── MATCH INFO HEADER ── */
+.match-info-bar{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+.mib-pill{background:var(--s3);border-radius:4px;padding:.15rem .5rem;font-size:10px;color:var(--t2);display:flex;align-items:center;gap:.25rem}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--s3);border:1px solid var(--grn);color:var(--grn);font-size:11px;padding:.45rem .9rem;border-radius:var(--r);opacity:0;transform:translateY(5px);transition:all .22s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+@media(max-width:700px){:root{--sidebar:100%}.workspace{flex-direction:column}.sidebar{width:100%;min-width:0;max-height:55vh}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand"><div class="dot"></div>BannerPrompt<span class="ver">v2</span></div>
+  <div class="nav-sep"></div>
+  <div class="tabs">
+    <button class="tab on" onclick="goTab(&#39;generate&#39;,this)">Генерація</button>
+    <button class="tab" onclick="goTab(&#39;library&#39;,this)">Бібліотека</button>
+    <button class="tab" onclick="goTab(&#39;settings&#39;,this)">Налаштування</button>
+  </div>
+</nav>
+
+<div class="workspace">
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<div class="sidebar">
+
+  <!-- 1. SHEETS IMPORT -->
+  <div class="sec open" id="sec-sheets">
+    <div class="sec-head" onclick="toggleSec(&#39;sec-sheets&#39;)">
+      <span class="sec-label">📊 Google Sheets</span>
+      <span class="sec-arrow">▾</span>
+    </div>
+    <div class="sec-body">
+      <div class="sheets-area">
+        <div class="field">
+          <label class="lbl">Посилання на таблицю (публічна)</label>
+          <input type="text" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/...">
+        </div>
+        <div style="font-size:10px;color:var(--t3);line-height:1.5">
+          Таблиця має бути відкрита для перегляду. Колонки: <strong style="color:var(--t2)">Date, Sport, League, Match, GEO</strong>
+        </div>
+        <div class="sheets-row">
+          <button class="btn btn-acc" style="flex:1" onclick="loadSheets()">Завантажити</button>
+          <button class="btn btn-sm" onclick="showSheetsHelp()">?</button>
+        </div>
+        <div class="sheets-status" id="sheets-status" style="display:none">
+          <div class="status-dot" id="sheets-dot"></div>
+          <span id="sheets-msg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MANUAL INPUT -->
+  <div class="sec" id="sec-manual">
+    <div class="sec-head" onclick="toggleSec(&#39;sec-manual&#39;)">
+      <span class="sec-label">✏️ Ввести вручну</span>
+      <span class="sec-arrow">▾</span>
+    </div>
+    <div class="sec-body">
+      <div class="field">
+        <label class="lbl">Спорт</label>
+        <select id="m-sport" onchange="updateLeagues()">
+          <option value="">— оберіть —</option>
+          <option>Soccer</option><option>Boxing</option><option>MMA</option>
+          <option>Basketball</option><option>Tennis</option><option>Formula1</option>
+          <option>American Football</option><option>Hockey</option><option>Rugby</option><option>Golf</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl">Ліга</label>
+        <select id="m-league"><option value="">—</option></select>
+      </div>
+      <div class="field">
+        <label class="lbl">Дата</label>
+        <input type="date" id="m-date">
+      </div>
+      <div class="field">
+        <label class="lbl" id="m-p-lbl">Команди / Учасники</label>
+        <input type="text" id="m-p1" placeholder="Учасник / Команда 1">
+        <div style="height:.3rem"></div>
+        <input type="text" id="m-p2" placeholder="Учасник / Команда 2">
+      </div>
+      <div class="field">
+        <label class="lbl">GEO</label>
+        <div class="geo-wrap" id="m-geo">
+          <div class="gchip on" data-g="GB" onclick="tg(this)">🇬🇧 UK</div>
+          <div class="gchip" data-g="PT" onclick="tg(this)">🇵🇹 PT</div>
+          <div class="gchip" data-g="DE" onclick="tg(this)">🇩🇪 DE</div>
+          <div class="gchip" data-g="FR" onclick="tg(this)">🇫🇷 FR</div>
+          <div class="gchip" data-g="ES" onclick="tg(this)">🇪🇸 ES</div>
+          <div class="gchip" data-g="IT" onclick="tg(this)">🇮🇹 IT</div>
+          <div class="gchip" data-g="US" onclick="tg(this)">🇺🇸 US</div>
+          <div class="gchip" data-g="BR" onclick="tg(this)">🇧🇷 BR</div>
+          <div class="gchip" data-g="PL" onclick="tg(this)">🇵🇱 PL</div>
+          <div class="gchip" data-g="NL" onclick="tg(this)">🇳🇱 NL</div>
+          <div class="gchip" data-g="CA" onclick="tg(this)">🇨🇦 CA</div>
+          <div class="gchip" data-g="AU" onclick="tg(this)">🇦🇺 AU</div>
+        </div>
+      </div>
+      <button class="btn btn-acc" style="width:100%" onclick="addManualMatch()">Додати до черги</button>
+    </div>
+  </div>
+
+  <!-- 3. MATCH QUEUE -->
+  <div class="sec open" style="flex:1;display:flex;flex-direction:column;overflow:hidden;border-bottom:none" id="sec-queue">
+    <div class="sec-head" onclick="toggleSec(&#39;sec-queue&#39;)">
+      <span class="sec-label">📋 Матчі <span id="queue-count" style="color:var(--acc)"></span></span>
+      <span class="sec-arrow">▾</span>
+    </div>
+    <div class="sec-body" style="flex: 1 1 0%; overflow: hidden; padding: 0px; display: flex;" id="queue-body">
+      <div class="match-list" id="match-list">
+        <div class="empty" style="height:80px"><div class="empty-txt">Завантаж таблицю або додай вручну</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════ MAIN PANEL ════════════════ -->
+<div class="panel" id="panel-generate">
+
+  <div class="main-toolbar">
+    <span class="main-title" id="toolbar-title">Оберіть матч зліва</span>
+    <div style="margin-left:auto;display:flex;gap:.5rem;align-items:center">
+      <button class="btn btn-sm" onclick="openEditor(null)">+ Промт</button>
+      <button class="btn btn-acc" id="gen-btn" onclick="generate()" disabled="">⚡ Генерувати</button>
+    </div>
+  </div>
+
+  <div class="main-body" id="main-gen-body">
+
+    <!-- PROMPT SEARCH -->
+    <div id="prompt-search-section" style="margin-bottom:1rem">
+      <div class="field" style="margin-bottom:.5rem">
+        <label class="lbl">🔍 AI-пошук промту <span style="color:var(--t3);font-weight:400;text-transform:none">(опис або ключові слова)</span></label>
+        <div class="psearch-wrap">
+          <span class="psearch-icon">◎</span>
+          <input type="text" id="psearch" placeholder="напр: cinematic crowd night stadium..." oninput="debouncedSearch()" onfocus="openPsearch()" onblur="setTimeout(closePsearch,200)">
+        </div>
+        <div class="psearch-results" id="psearch-results"></div>
+      </div>
+      <div id="selected-prompt-card" style="display:none;background:var(--s2);border:1px solid var(--acc-br);border-radius:var(--r2);padding:.65rem .85rem">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem">
+          <div>
+            <div style="font-size:11px;font-weight:500;color:var(--acc);margin-bottom:.25rem" id="sp-name"></div>
+            <div style="font-size:11px;color:var(--t2);line-height:1.55" id="sp-preview"></div>
+          </div>
+          <button class="btn btn-sm btn-icon" onclick="clearSelectedPrompt()" title="Скинути">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results-empty" class="empty" style="height:calc(100% - 130px)">
+      <div class="empty-ico">⚡</div>
+      <div class="empty-txt">Оберіть матч та промт → Генерувати</div>
+    </div>
+
+    <div id="results-wrap" style="display:none">
+      <div class="match-info-bar" id="match-info-bar"></div>
+      <div id="results-cards"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════ LIBRARY PANEL ════════ -->
+<div class="panel" id="panel-library" style="display:none">
+  <div class="main-toolbar">
+    <input type="text" id="lib-search" placeholder="Пошук по бібліотеці..." oninput="renderLib()" style="max-width:280px">
+    <span style="font-size:10px;color:var(--t3);margin-left:.5rem" id="lib-count"></span>
+    <div style="margin-left:auto"><button class="btn btn-acc" onclick="openEditor(null)">+ Новий промт</button></div>
+  </div>
+  <div class="main-body">
+    <div class="lib-grid" id="lib-grid"></div>
+  </div>
+</div>
+
+<!-- ════════ SETTINGS PANEL ════════ -->
+<div class="panel" id="panel-settings" style="display:none">
+  <div class="main-toolbar"><span class="main-title">Налаштування</span></div>
+  <div class="main-body">
+    <div style="max-width:500px;display:flex;flex-direction:column;gap:1rem">
+
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:1rem">
+        <div style="font-size:12px;font-weight:500;margin-bottom:.75rem">📋 Формат Google Sheets</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.8">
+          Таблиця має бути <strong style="color:var(--t1)">відкрита для перегляду</strong> (File → Share → Anyone with the link → Viewer).<br><br>
+          Очікуваний формат колонок:<br>
+          <code style="background:var(--s3);padding:2px 6px;border-radius:4px;font-size:10px">A: Date &nbsp;|&nbsp; B: Sport &nbsp;|&nbsp; C: League &nbsp;|&nbsp; D: Match &nbsp;|&nbsp; E: GEO</code><br><br>
+          GEO — через кому: <code style="background:var(--s3);padding:2px 6px;border-radius:4px;font-size:10px">GB,PT,DE</code><br><br>
+          Перший рядок — заголовки (пропускаються автоматично).
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:1rem">
+        <div style="font-size:12px;font-weight:500;margin-bottom:.75rem">🔄 Імпорт / Експорт бібліотеки</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="btn" onclick="exportLib()">↓ Експортувати JSON</button>
+          <label class="btn" style="cursor:pointer">↑ Імпортувати JSON<input type="file" accept=".json" onchange="importLib(event)" style="display:none"></label>
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:1rem">
+        <div style="font-size:12px;font-weight:500;margin-bottom:.5rem">📊 Статистика</div>
+        <div style="font-size:11px;color:var(--t2);display:flex;flex-direction:column;gap:.3rem">
+          <div>Промтів у бібліотеці: <strong style="color:var(--t1)" id="stat-prompts">0</strong></div>
+          <div>Згенеровано сесій: <strong style="color:var(--t1)" id="stat-gens">0</strong></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- workspace -->
+
+<!-- ════════ MODAL EDITOR ════════ -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="mh">
+      <span class="mt" id="modal-t">Новий промт</span>
+      <button class="btn btn-sm btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mb">
+      <div class="field">
+        <label class="lbl">Назва промту</label>
+        <input type="text" id="e-name" placeholder="напр. Cinematic stadium wide angle">
+      </div>
+      <div class="field">
+        <label class="lbl">Текст промту</label>
+        <textarea id="e-prompt" rows="7" placeholder="Введіть базовий промт. Клод автоматично адаптує під матч, гравців та GEO — нічого підставляти вручну не потрібно."></textarea>
+        <div style="font-size:10px;color:var(--t3);margin-top:.2rem;line-height:1.5">Клод сам знайде актуальних гравців, адаптує стиль та культурний контекст під кожне GEO.</div>
+      </div>
+      <div class="field">
+        <label class="lbl">Теги (через кому)</label>
+        <input type="text" id="e-tags" placeholder="cinematic, outdoor, night, crowd">
+      </div>
+      <div class="field">
+        <label class="lbl">Спорт (опційно, для фільтрації)</label>
+        <select id="e-sport">
+          <option value="">Будь-який</option>
+          <option>Soccer</option><option>Boxing</option><option>MMA</option>
+          <option>Basketball</option><option>Tennis</option><option>Formula1</option>
+          <option>American Football</option><option>Hockey</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn" onclick="closeModal()">Скасувати</button>
+      <button class="btn btn-acc" onclick="savePromptEdit()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════════════════
+const GEO = {
+  GB:{n:'United Kingdom',f:'🇬🇧',lang:'English',city:'London',adj:'British',ctx:'British sports culture, Premier League passionate fans, dramatic and intense atmosphere'},
+  PT:{n:'Portugal',f:'🇵🇹',lang:'Portuguese',city:'Lisbon',adj:'Portuguese',ctx:'passionate Iberian football culture, warm Mediterranean tones'},
+  DE:{n:'Germany',f:'🇩🇪',lang:'German',city:'Berlin',adj:'German',ctx:'Bundesliga culture, disciplined and precise atmosphere, crisp visuals'},
+  FR:{n:'France',f:'🇫🇷',lang:'French',city:'Paris',adj:'French',ctx:'Ligue 1 culture, diverse passionate fan base, elegant visual style'},
+  ES:{n:'Spain',f:'🇪🇸',lang:'Spanish',city:'Madrid',adj:'Spanish',ctx:'LaLiga passion, sunny Mediterranean football atmosphere'},
+  IT:{n:'Italy',f:'🇮🇹',lang:'Italian',city:'Rome',adj:'Italian',ctx:'Serie A passion, classic cinematic football aesthetics'},
+  US:{n:'United States',f:'🇺🇸',lang:'English',city:'New York',adj:'American',ctx:'American sports entertainment culture, high energy and showbiz'},
+  BR:{n:'Brazil',f:'🇧🇷',lang:'Portuguese',city:'São Paulo',adj:'Brazilian',ctx:'vibrant carnival-like football culture, jogo bonito, warm colorful visuals'},
+  PL:{n:'Poland',f:'🇵🇱',lang:'Polish',city:'Warsaw',adj:'Polish',ctx:'passionate Eastern European football culture, intense fan atmosphere'},
+  NL:{n:'Netherlands',f:'🇳🇱',lang:'Dutch',city:'Amsterdam',adj:'Dutch',ctx:'Eredivisie total football culture, clean modern visual style'},
+  CA:{n:'Canada',f:'🇨🇦',lang:'English/French',city:'Toronto',adj:'Canadian',ctx:'North American sports culture, multicultural diverse fan base'},
+  AU:{n:'Australia',f:'🇦🇺',lang:'English',city:'Sydney',adj:'Australian',ctx:'Australian sports culture, outdoor energetic sun-drenched atmosphere'},
+};
+
+const LEAGUES = {
+  Soccer:['Premier League (England)','LaLiga (Spain)','Bundesliga (Germany)','Ligue 1 (France)','Serie A (Italy)','Primeira Liga (Portugal)','Eredivisie (Netherlands)','Champions League','Europa League','Conference League','World Cup','EURO','MLS'],
+  Boxing:['WBA','WBC','IBF','WBO','Matchroom Boxing','Top Rank','DAZN Boxing'],
+  MMA:['UFC','Bellator','ONE Championship','PFL'],
+  Basketball:['NBA','EuroLeague','FIBA World Cup','NBA Playoffs'],
+  Tennis:['Wimbledon','Roland Garros','US Open','Australian Open','ATP Finals','WTA Finals'],
+  Formula1:['F1 World Championship','F1 Grand Prix'],
+  'American Football':['NFL Regular Season','NFL Playoffs','Super Bowl'],
+  Hockey:['NHL','Stanley Cup Playoffs','IIHF World Championship'],
+  Rugby:['Six Nations','Rugby World Cup','Premiership Rugby','Pro14'],
+  Golf:['The Masters','The Open','US Open Golf','PGA Championship'],
+};
+
+const SPORT_ICONS = {Soccer:'⚽',Boxing:'🥊',MMA:'🥋',Basketball:'🏀',Tennis:'🎾',Formula1:'🏎',
+  'American Football':'🏈',Hockey:'🏒',Rugby:'🏉',Golf:'⛳'};
+
+let prompts = JSON.parse(localStorage.getItem('bpg_v2_prompts') || 'null') || [
+  {id:1,name:'Cinematic stadium atmosphere',sport:'Soccer',tags:['cinematic','stadium','crowd','night'],prompt:'Cinematic IMAX wide-angle shot of a packed football stadium at night, 90,000 fans under blazing floodlights, sea of scarves and flags, dramatic low-angle perspective from the pitch, volumetric light beams, photorealistic 8K, ESPN broadcast quality, anamorphic lens flare'},
+  {id:2,name:'Warrior face-off portrait',sport:'',tags:['portrait','face-off','dramatic'],prompt:'Two elite athletes facing each other in dramatic close-up, intense eye contact, split-lighting from opposite sides, arena fog, hyper-realistic skin textures, high contrast editorial sports photography, blurred crowd behind, tension-filled pre-match atmosphere'},
+  {id:3,name:'Action freeze frame',sport:'',tags:['action','freeze','motion blur'],prompt:'Ultra-slow-motion freeze frame of a decisive athletic moment, subject pin-sharp, background motion-blurred crowd, sweat droplets suspended mid-air, stadium floodlights creating anamorphic lens flares, hyper-realistic, Sports Illustrated cover quality, 8K'},
+  {id:4,name:'Abstract neon energy',sport:'',tags:['abstract','neon','digital art'],prompt:'Abstract sports energy visualization, neon light trails forming silhouette of athlete in motion, deep black background, electric cyan and magenta streaks, particle explosions, futuristic digital art, 4K ultra-wide composition'},
+  {id:5,name:'Trophy golden moment',sport:'',tags:['trophy','golden hour','emotion'],prompt:'Championship trophy raised by victorious athlete in golden hour sunlight, teammates rushing in from sides, stadium erupting in celebration, shallow depth of field, warm cinematic color grade, dust particles in light beams, Sports Illustrated cover quality'},
+  {id:6,name:'Boxing ring drama',sport:'Boxing',tags:['boxing','ring','dramatic'],prompt:'Inside a boxing arena moments before the main event, empty ring spotlit from above, roaring crowd in darkness surrounding it, dramatic top-down angle, smoke machine haze, HBO Sports documentary aesthetic, 8K cinematic'},
+  {id:7,name:'Broadcast tactical overhead',sport:'Soccer',tags:['overhead','tactical','broadcast'],prompt:'Aerial broadcast view of football pitch during match, tactical formation clearly visible, vivid green grass, stadium filled to capacity, BBC Sports broadcast aesthetic, ultra-sharp 8K, golden hour side lighting raking across the pitch'},
+  {id:8,name:'Locker room pre-match',sport:'',tags:['locker room','pre-match','emotion'],prompt:'Locker room just before the match, athletes in full kit in focused silence, dramatic single overhead light source, jersey details sharp, intense psychological atmosphere, film grain, documentary photography style, moody and raw'},
+];
+let nextId = Math.max(...prompts.map(p=>p.id),0)+1;
+
+let matches = [];
+let selectedMatch = null;
+let selectedPromptId = null;
+let editingId = null;
+let genCount = parseInt(localStorage.getItem('bpg_v2_gens')||'0');
+
+function savePrompts(){localStorage.setItem('bpg_v2_prompts',JSON.stringify(prompts))}
+function saveGens(){localStorage.setItem('bpg_v2_gens',String(genCount))}
+
+// ══════════════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════════════
+function goTab(name, el){
+  ['generate','library','settings'].forEach(t=>{
+    document.getElementById('panel-'+t).style.display=t===name?'flex':'none';
+  });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  if(name==='library'){renderLib()}
+  if(name==='settings'){document.getElementById('stat-prompts').textContent=prompts.length;document.getElementById('stat-gens').textContent=genCount}
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SIDEBAR SECTIONS
+// ══════════════════════════════════════════════════════════════
+function toggleSec(id){
+  const s=document.getElementById(id);
+  s.classList.toggle('open');
+  if(id==='sec-queue'){
+    const body=document.getElementById('queue-body');
+    body.style.display=s.classList.contains('open')?'flex':'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LEAGUES
+// ══════════════════════════════════════════════════════════════
+function updateLeagues(){
+  const sport=document.getElementById('m-sport').value;
+  const sel=document.getElementById('m-league');
+  const lbl=document.getElementById('m-p-lbl');
+  if(!sport){sel.innerHTML='<option value="">—</option>';return}
+  sel.innerHTML='<option value="">— ліга —</option>'+(LEAGUES[sport]||[]).map(l=>`<option>${l}</option>`).join('');
+  const isBoxing=sport==='Boxing'||sport==='MMA';
+  const isTennis=sport==='Tennis'||sport==='Golf';
+  lbl.textContent=isBoxing?'Боксери / Бійці':isTennis?'Гравці':sport==='Formula1'?'Гонщик / Команда':'Команди';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GEO
+// ══════════════════════════════════════════════════════════════
+function tg(el){el.classList.toggle('on')}
+function getGeos(){return[...document.querySelectorAll('#m-geo .gchip.on')].map(e=>e.dataset.g)}
+
+// ══════════════════════════════════════════════════════════════
+//  MATCH QUEUE
+// ══════════════════════════════════════════════════════════════
+function addManualMatch(){
+  const sport=document.getElementById('m-sport').value;
+  const league=document.getElementById('m-league').value;
+  const date=document.getElementById('m-date').value;
+  const p1=document.getElementById('m-p1').value.trim();
+  const p2=document.getElementById('m-p2').value.trim();
+  const geos=getGeos();
+  if(!sport||!p1||!geos.length){toast('Заповніть спорт, учасника та GEO',false);return}
+  const m={id:Date.now(),sport,league,date,p1,p2,geos,src:'manual'};
+  matches.push(m);
+  renderMatchList();
+  selectMatch(m.id);
+  toast('Матч додано до черги');
+}
+
+function renderMatchList(){
+  const list=document.getElementById('match-list');
+  document.getElementById('queue-count').textContent=matches.length?'('+matches.length+')':'';
+  if(!matches.length){list.innerHTML='<div class="empty" style="height:80px"><div class="empty-txt">Немає матчів</div></div>';return}
+  list.innerHTML=matches.map(m=>`
+    <div class="match-item${selectedMatch?.id===m.id?' active':''}" onclick="selectMatch(${m.id})">
+      <div class="mi-sport">${SPORT_ICONS[m.sport]||'🏆'} ${m.sport}${m.league?' · '+m.league.split('(')[0].trim():''}
+        <span style="margin-left:auto;color:var(--t3)">${m.src==='sheets'?'📊':'✏️'}</span>
+      </div>
+      <div class="mi-name">${m.p1}${m.p2?' vs '+m.p2:''}</div>
+      <div class="mi-meta">
+        ${m.date?`<span>📅 ${fmt(m.date)}</span>`:''}
+        ${m.geos.map(g=>`<span class="geo-tag">${GEO[g]?.f||''}${g}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function fmt(d){try{return new Date(d).toLocaleDateString('uk-UA',{day:'numeric',month:'short'})}catch{return d}}
+
+function selectMatch(id){
+  selectedMatch=matches.find(m=>m.id===id);
+  renderMatchList();
+  const t=document.getElementById('toolbar-title');
+  if(selectedMatch){
+    t.textContent=selectedMatch.p1+(selectedMatch.p2?' vs '+selectedMatch.p2:'');
+  }
+  checkGenBtn();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GOOGLE SHEETS IMPORT
+// ══════════════════════════════════════════════════════════════
+async function loadSheets(){
+  const url=document.getElementById('sheets-url').value.trim();
+  if(!url){toast('Введіть посилання',false);return}
+  setStatus('loading','Завантажую...');
+  try{
+    const id=extractSheetId(url);
+    if(!id)throw new Error('Не вдалося знайти ID таблиці в посиланні');
+    // Export as CSV (gid=0 = first sheet)
+    const csvUrl=`https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=0`;
+    const res=await fetch(csvUrl);
+    if(!res.ok)throw new Error('Таблиця недоступна. Перевірте налаштування доступу (File → Share → Anyone with the link → Viewer)');
+    const text=await res.text();
+    const rows=parseCSV(text);
+    if(rows.length<2)throw new Error('Таблиця порожня або неправильний формат');
+    // Remove header row
+    const dataRows=rows.slice(1).filter(r=>r.some(c=>c.trim()));
+    const imported=dataRows.map((r,i)=>({
+      id:Date.now()+i,
+      date:(r[0]||'').trim(),
+      sport:(r[1]||'').trim()||'Soccer',
+      league:(r[2]||'').trim(),
+      p1:(r[3]||'').trim(),
+      p2:(r[4]||'').trim(),
+      geos:(r[5]||'GB').split(',').map(g=>g.trim().toUpperCase()).filter(g=>GEO[g]),
+      src:'sheets'
+    })).filter(m=>m.p1);
+    // Parse "Team1 vs Team2" format in Match column if needed
+    imported.forEach(m=>{
+      if(m.p1.toLowerCase().includes(' vs ')){
+        const parts=m.p1.split(/\s+vs\s+/i);
+        m.p1=parts[0].trim();
+        m.p2=parts[1]?.trim()||m.p2;
+      }
+    });
+    matches=[...matches,...imported];
+    renderMatchList();
+    if(imported.length&&!selectedMatch)selectMatch(imported[0].id);
+    setStatus('ok',`Завантажено ${imported.length} матчів`);
+    toast(`✓ ${imported.length} матчів імпортовано`);
+    // Open queue section
+    const qSec=document.getElementById('sec-queue');
+    if(!qSec.classList.contains('open'))toggleSec('sec-queue');
+  }catch(e){
+    setStatus('err',e.message);
+    toast(e.message,false);
+  }
+}
+
+function extractSheetId(url){
+  const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return m?m[1]:null;
+}
+
+function parseCSV(text){
+  const rows=[];
+  const lines=text.split('\n');
+  for(const line of lines){
+    if(!line.trim())continue;
+    const row=[];let cur='';let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}
+      else if(c===','&&!inQ){row.push(cur);cur=''}
+      else{cur+=c}
+    }
+    row.push(cur);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function setStatus(type,msg){
+  const wrap=document.getElementById('sheets-status');
+  const dot=document.getElementById('sheets-dot');
+  const msgEl=document.getElementById('sheets-msg');
+  wrap.style.display='flex';
+  dot.className='status-dot'+(type==='ok'?' ok':type==='err'?' err':type==='loading'?' loading':'');
+  msgEl.textContent=msg;
+}
+
+function showSheetsHelp(){
+  alert('Формат колонок:\nA: Date | B: Sport | C: League | D: Match (або "Team1 vs Team2") | E: P2 (опційно) | F: GEO (GB,PT,DE)\n\nТаблиця має бути відкрита для перегляду:\nFile → Share → Anyone with the link → Viewer');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  AI PROMPT SEARCH
+// ══════════════════════════════════════════════════════════════
+let searchTimer=null;
+function debouncedSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(aiSearch,400)}
+
+async function aiSearch(){
+  const q=document.getElementById('psearch').value.trim();
+  const res=document.getElementById('psearch-results');
+  if(!q){res.classList.remove('open');return}
+
+  // Simple local search first (fast)
+  const sport=selectedMatch?.sport||'';
+  const localScored=prompts.map(p=>{
+    let score=0;
+    const text=(p.name+' '+p.prompt+' '+(p.tags||[]).join(' ')).toLowerCase();
+    const words=q.toLowerCase().split(/\s+/);
+    words.forEach(w=>{if(text.includes(w))score+=w.length>3?2:1});
+    if(p.sport&&p.sport===sport)score+=3;
+    if(!p.sport)score+=0.5;
+    return{...p,score};
+  }).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).slice(0,6);
+
+  renderPsearchResults(localScored,q);
+  res.classList.add('open');
+}
+
+function renderPsearchResults(items,q){
+  const res=document.getElementById('psearch-results');
+  if(!items.length){res.innerHTML='<div style="padding:.6rem .85rem;font-size:11px;color:var(--t3)">Нічого не знайдено</div>';return}
+  res.innerHTML=items.map(p=>`
+    <div class="pr-item${selectedPromptId===p.id?' on':''}" onmousedown="selectPrompt(${p.id})">
+      <div class="pr-name">${hl(p.name,q)}<span class="pr-score">${Math.round(p.score*10)/10}</span></div>
+      <div class="pr-preview">${hl(p.prompt.substring(0,120),q)}...</div>
+    </div>`).join('');
+}
+
+function hl(text,q){
+  if(!q)return esc(text);
+  const words=q.toLowerCase().split(/\s+/).filter(w=>w.length>1);
+  let out=esc(text);
+  words.forEach(w=>{
+    const re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    out=out.replace(re,'<mark style="background:rgba(212,255,78,.2);color:var(--acc);border-radius:2px">$1</mark>');
+  });
+  return out;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function selectPrompt(id){
+  selectedPromptId=id;
+  const p=prompts.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('selected-prompt-card').style.display='block';
+  document.getElementById('sp-name').textContent=p.name+(p.sport?` [${p.sport}]`:'');
+  document.getElementById('sp-preview').textContent=p.prompt.substring(0,200)+'...';
+  document.getElementById('psearch').value='';
+  closePsearch();
+  checkGenBtn();
+  toast('Промт: '+p.name);
+}
+
+function clearSelectedPrompt(){
+  selectedPromptId=null;
+  document.getElementById('selected-prompt-card').style.display='none';
+  document.getElementById('psearch').value='';
+  checkGenBtn();
+}
+
+function openPsearch(){
+  const q=document.getElementById('psearch').value.trim();
+  if(q)aiSearch();
+}
+function closePsearch(){document.getElementById('psearch-results').classList.remove('open')}
+
+function checkGenBtn(){
+  const ok=selectedMatch&&selectedPromptId;
+  document.getElementById('gen-btn').disabled=!ok;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GENERATE
+// ══════════════════════════════════════════════════════════════
+async function generate(){
+  if(!selectedMatch||!selectedPromptId)return;
+  const m=selectedMatch;
+  const p=prompts.find(x=>x.id===selectedPromptId);
+  if(!p)return;
+
+  genCount++;saveGens();
+
+  const dateStr=m.date?fmtFull(m.date):'найближчий матч';
+  const participants=m.p2?`${m.p1} vs ${m.p2}`:m.p1;
+
+  document.getElementById('results-empty').style.display='none';
+  document.getElementById('results-wrap').style.display='block';
+
+  // Match info bar
+  document.getElementById('match-info-bar').innerHTML=`
+    <div class="mib-pill">${SPORT_ICONS[m.sport]||'🏆'} ${m.sport}</div>
+    ${m.league?`<div class="mib-pill">📋 ${m.league}</div>`:''}
+    <div class="mib-pill">⚔️ ${participants}</div>
+    ${m.date?`<div class="mib-pill">📅 ${dateStr}</div>`:''}
+    <div class="mib-pill" style="background:var(--acc-bg);color:var(--acc)">🎨 ${p.name}</div>`;
+
+  const cards=document.getElementById('results-cards');
+  cards.innerHTML='';
+
+  // Create loading cards for each GEO
+  m.geos.forEach(gcode=>{
+    const g=GEO[gcode]||{n:gcode,f:'🌍'};
+    const card=document.createElement('div');
+    card.className='result-card';
+    card.id='rcard-'+gcode;
+    card.innerHTML=`
+      <div class="rc-head">
+        <span class="rc-flag">${g.f}</span>
+        <span class="rc-geo">${g.n}</span>
+        <span class="rc-words" id="rw-${gcode}"></span>
+        <button class="copy-btn" id="rcopy-${gcode}" onclick="copyGeo('${gcode}')" disabled>Копіювати ↗</button>
+      </div>
+      <div class="rc-body">
+        <div class="loading-row" id="rload-${gcode}"><div class="spin"></div>Генерую для ${g.n}...</div>
+        <div class="rc-text" id="rtext-${gcode}" style="display:none"></div>
+        <div class="err-box" id="rerr-${gcode}" style="display:none"></div>
+      </div>`;
+    cards.appendChild(card);
+  });
+
+  // Generate sequentially
+  for(const gcode of m.geos){
+    await genForGeo(gcode,{m,p,dateStr,participants});
+  }
+}
+
+async function genForGeo(gcode,{m,p,dateStr,participants}){
+  const g=GEO[gcode]||{n:gcode,lang:'English',adj:gcode,ctx:'sports culture'};
+
+  const system=`You are an expert creative director specializing in sports marketing visuals. You create image generation prompts optimized specifically for NanoBanana AI image generator.
+
+Your task: take the provided visual prompt template and adapt it for a specific sports event and target market.
+
+STRICT OUTPUT RULES:
+- Output ONLY the final adapted prompt — zero intro, zero explanation, zero markdown
+- 60-120 words total
+- For team sports: naturally incorporate 1-2 of the most famous CURRENT active players (2024-2025 season) wearing their club's kit colors — verify this mentally
+- For boxing/MMA: reference fighters' known physical style, fighting stance, or signature look
+- For Formula1: include team colors and helmet design
+- Subtly adapt visual mood to the GEO: UK=moody dramatic; Brazil=vibrant warm; Germany=crisp precise; Spain=sunny passionate; France=elegant cinematic; Italy=dramatic classic
+- End the prompt with: --ar 16:9 --style raw
+- Never mention country/language explicitly — weave culture into visual atmosphere only`;
+
+  const user=`Sport: ${m.sport}
+${m.league?'League/Tournament: '+m.league:''}
+Match/Event: ${participants}
+Date: ${dateStr}
+Target GEO market: ${g.n} (${g.lang})
+Cultural context: ${g.ctx}
+
+Visual template to adapt:
+"${p.prompt}"
+
+Adapt this template for the match above. Use current 2024-2025 season players for team sports.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        system,
+        messages:[{role:'user',content:user}]
+      })
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error?.message||`API error ${res.status}`);
+    const text=data.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+    document.getElementById('rload-'+gcode).style.display='none';
+    document.getElementById('rtext-'+gcode).style.display='block';
+    document.getElementById('rtext-'+gcode).textContent=text;
+    document.getElementById('rw-'+gcode).textContent=text.split(/\s+/).length+' слів';
+    const btn=document.getElementById('rcopy-'+gcode);
+    btn.disabled=false;
+    window['_res_'+gcode]=text;
+  }catch(e){
+    document.getElementById('rload-'+gcode).style.display='none';
+    document.getElementById('rerr-'+gcode).style.display='block';
+    document.getElementById('rerr-'+gcode).textContent='⚠ '+e.message;
+  }
+}
+
+function copyGeo(geo){
+  const text=window['_res_'+geo];
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('rcopy-'+geo);
+    const orig=btn.textContent;
+    btn.textContent='✓ Скопійовано';btn.classList.add('done');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('done')},2200);
+    toast('Скопійовано для '+geo);
+  });
+}
+
+function fmtFull(d){try{return new Date(d).toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'})}catch{return d}}
+
+// ══════════════════════════════════════════════════════════════
+//  LIBRARY
+// ══════════════════════════════════════════════════════════════
+function renderLib(){
+  const q=(document.getElementById('lib-search')?.value||'').toLowerCase();
+  const filtered=prompts.filter(p=>!q||p.name.toLowerCase().includes(q)||p.prompt.toLowerCase().includes(q)||(p.tags||[]).some(t=>t.includes(q)));
+  document.getElementById('lib-count').textContent=filtered.length+' / '+prompts.length;
+  document.getElementById('lib-grid').innerHTML=filtered.map(p=>`
+    <div class="lib-card${selectedPromptId===p.id?' on':''}" onclick="selectFromLib(${p.id})">
+      <div class="lc-actions">
+        <button class="btn btn-sm btn-icon" onclick="event.stopPropagation();openEditor(${p.id})" title="Ред.">✏</button>
+        <button class="btn btn-sm btn-icon" onclick="event.stopPropagation();delPrompt(${p.id})" title="Видалити" style="color:var(--red)">✕</button>
+      </div>
+      <div class="lc-name">${esc(p.name)}${p.sport?` <span style="color:var(--t3);font-size:10px">[${p.sport}]</span>`:''}</div>
+      <div class="lc-preview">${esc(p.prompt.substring(0,150))}...</div>
+      ${p.tags?.length?`<div class="lc-tags">${p.tags.map(t=>`<span class="lc-tag">${t}</span>`).join('')}</div>`:''}
+    </div>`).join('')||'<div class="empty" style="height:80px"><div class="empty-txt">Нічого не знайдено</div></div>';
+}
+
+function selectFromLib(id){
+  selectPrompt(id);
+  goTab('generate',document.querySelector('.tab'));
+  document.querySelectorAll('.tab')[0].click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EDITOR MODAL
+// ══════════════════════════════════════════════════════════════
+function openEditor(id){
+  editingId=id;
+  const p=id?prompts.find(x=>x.id===id):null;
+  document.getElementById('modal-t').textContent=id?'Редагувати промт':'Новий промт';
+  document.getElementById('e-name').value=p?.name||'';
+  document.getElementById('e-prompt').value=p?.prompt||'';
+  document.getElementById('e-tags').value=(p?.tags||[]).join(', ');
+  document.getElementById('e-sport').value=p?.sport||'';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('e-name').focus(),50);
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+
+function savePromptEdit(){
+  const name=document.getElementById('e-name').value.trim();
+  const prompt=document.getElementById('e-prompt').value.trim();
+  const tags=document.getElementById('e-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const sport=document.getElementById('e-sport').value;
+  if(!name||!prompt){toast('Заповніть назву та промт',false);return}
+  if(editingId){
+    const idx=prompts.findIndex(x=>x.id===editingId);
+    if(idx>=0)prompts[idx]={...prompts[idx],name,prompt,tags,sport};
+  }else{
+    prompts.push({id:nextId++,name,prompt,tags,sport});
+  }
+  savePrompts();closeModal();renderLib();toast('Збережено!');
+}
+
+function delPrompt(id){
+  if(!confirm('Видалити цей промт?'))return;
+  prompts=prompts.filter(x=>x.id!==id);
+  if(selectedPromptId===id)clearSelectedPrompt();
+  savePrompts();renderLib();toast('Видалено');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  IMPORT / EXPORT
+// ══════════════════════════════════════════════════════════════
+function exportLib(){
+  const blob=new Blob([JSON.stringify(prompts,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='prompts.json';a.click();
+}
+
+function importLib(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data))throw new Error('Невірний формат');
+      const merged=[...prompts];
+      let added=0;
+      data.forEach(p=>{if(p.name&&p.prompt&&!merged.find(x=>x.name===p.name)){merged.push({...p,id:nextId++});added++}});
+      prompts=merged;savePrompts();renderLib();
+      toast(`Імпортовано ${added} нових промтів`);
+    }catch(err){toast('Помилка імпорту: '+err.message,false)}
+  };
+  r.readAsText(file);
+  e.target.value='';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════════
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.borderColor=ok?'var(--grn)':'var(--red)';
+  t.style.color=ok?'var(--grn)':'var(--red)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+document.getElementById('m-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('sec-queue').classList.add('open');
+document.getElementById('queue-body').style.display='flex';
+</script>
+
+
+</body></html>
